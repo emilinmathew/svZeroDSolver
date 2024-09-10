@@ -71,7 +71,7 @@ describe('Node interaction', () => {
         // type node name
         cy.get('#node-name').type('INFLOW');
 
-        cy.get('#draw-on').click();
+        cy.get('#edge-draw-button').click();
 
         cy.get('#cy').click(100, 100); // Coordinates for the first node
 
@@ -138,7 +138,7 @@ describe('Node interaction', () => {
         // type node name
         cy.get('#node-name').type('INFLOW');
 
-        cy.get('#draw-on').click();
+        cy.get('#edge-draw-button').click();
 
         cy.get('#cy').click(100, 100); // Coordinates for the first node
 
@@ -223,7 +223,7 @@ describe('Node interaction', () => {
         // type node name
         cy.get('#node-name').type('INFLOW');
 
-        cy.get('#draw-on').click();
+        cy.get('#edge-draw-button').click();
 
         cy.get('#cy').click(100, 100); // Coordinates for the first node
 
