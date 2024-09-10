@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var deleteMode = false;
     let isDrawModeEnabled = false; // Track the state of draw mode
 
-
      document.querySelector('#submitJunctionButton').addEventListener('click', function() {
             submitJunctionInfo();
         });
@@ -759,7 +758,13 @@ document.addEventListener('DOMContentLoaded', function() {
         currentType = currentNode.data('type');
         if (deleteMode) {
                 var node = event.target;
+                node_name = node.data('name');
                 node.remove();
+                var index = node_name_list.indexOf(node_name);
+                if (index !== -1) {
+                    // Remove the nodeName from the list
+                    node_name_list.splice(index, 1);
+                }
         }
         else if (currentType == 'vessel') {
             showNodeInfoModal(currentType); // Show the modal form

@@ -83,9 +83,8 @@ body {
     display: flex;
     align-items: center;
 }
-/* Position for the boundary condition drop down container */
 #boundary-condition-type-container {
-    margin-left: 10px; /* Adjust as needed */
+    display: none; /* Initially hide the container */
 }
 
 /* Styling for the junction parameter form so there's two input boxes side by side
@@ -109,12 +108,22 @@ body {
     margin-right: 10px;   /* Space between inputs */
 }
 
+.header_container {
+  width: 80%;
+  margin: auto;
+  padding-top: 20px;
+  overflow: auto; /* Allow scrolling if content overflows */
+}
+
 /* Styling for the node,
 boundary condition, and node name selection containers */
 .container {
   width: 80%;
   margin: auto;
   padding-top: 20px;
+  display: flex; /* Use Flexbox to align child elements */
+  align-items: center; /* Vertically center items */
+  gap: 10px; /* Space between the child elements */
   overflow: auto; /* Allow scrolling if content overflows */
 }
 

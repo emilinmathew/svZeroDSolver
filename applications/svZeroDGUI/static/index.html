@@ -17,7 +17,7 @@
 
   <body>
     <h1>No Code 0d Vasculature Generation Platform</h1>
-    <div class="container">
+    <div class="header_container">
         <button class="collapsible">Instructions</button>
         <div class="content">
           <p>This program allows you to draw a cardiovascular pathway and export it as a JSON file, structured as input for SimVascular’s ZeroD Solver.</p>
@@ -30,7 +30,8 @@
             <li>Click Export to JSON to download the text file. Once you get the text file, you can manually add data points.</li>
           </ol>
         </div>
-
+    </div>
+    <div class="container">
         <label for="node-type">Select node type:</label>
         <select id="node-type" onchange="updateBoundaryConditionTypeVisibility()">
             <option value="vessel">Vessel</option>
@@ -39,7 +40,7 @@
             <option value="junction">Junction</option>
             <option value="boundary_condition">Boundary Condition</option>
         </select>
-        <div id="boundary-condition-type-container" style="display:none;">
+        <div id="boundary-condition-type-container">
             <label for="boundary-condition-type">Select boundary condition type:</label>
             <select id="boundary-condition-type">
                 <option value="FLOW">Flow</option>
