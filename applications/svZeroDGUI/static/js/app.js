@@ -12,10 +12,10 @@ function updateBoundaryConditionTypeVisibility() {
     const boundaryConditionTypeContainer = document.getElementById('boundary-condition-type-container');
     if (nodeType === 'boundary_condition') {
         boundaryConditionTypeContainer.style.display = 'block';
-        // Scroll to reveal the container
-        requestAnimationFrame(() => {
-          const dropdownHeight = boundaryConditionTypeContainer.offsetHeight;
-          window.scrollBy(0, dropdownHeight);
+        // Use scrollIntoView for a more reliable scroll
+        boundaryConditionTypeContainer.scrollIntoView({
+            behavior: 'smooth', // Smooth scrolling
+            block: 'start'      // Align the top of the element to the top of the viewport
         });
     } else {
         boundaryConditionTypeContainer.style.display = 'none';
@@ -39,8 +39,11 @@ const flow_icon = '/static/css/flow.png';
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    let simulation_parameters_dict = {}
+    let simulation_parameters_dict = {};
+    let node_name_list = [];
     var deleteMode = false;
+    let isDrawModeEnabled = false; // Track the state of draw mode
+
 
      document.querySelector('#submitJunctionButton').addEventListener('click', function() {
             submitJunctionInfo();
@@ -82,103 +85,92 @@ document.addEventListener('DOMContentLoaded', function() {
             let boundaryConditionType = nodeType === 'boundary_condition' ? document.getElementById('boundary-condition-type').value : null;
 
             if (nodeName !== "") {
-                let pos = event.position || event.cyRenderedPosition;
-                let nodeId = `${nodeType}-${node_count[nodeType]}`;
-                node_count[nodeType] += 1;
+                if (node_name_list.includes(nodeName)) {
+                    alert("This name has been used. Please enter another node name.");
+                }
+                else {
+                    node_name_list.push(nodeName);
+                    let pos = event.position || event.cyRenderedPosition;
+                    let nodeId = `${nodeType}-${node_count[nodeType]}`;
+                    node_count[nodeType] += 1;
 
-                let color;
-                if (nodeType === 'boundary_condition') {
-                    // Sets the icons and edge color for each node
-                    switch (boundaryConditionType) {
-                        case 'FLOW':
-                            color = '#FF00FF';  // Magenta
-                            node_icon = flow_icon;
-                            break;
-                        case 'RESISTANCE':
-                            color = 'purple';
-                            node_icon = resistance_icon;
-                            break;
-                        case 'PRESSURE':
-                            color = 'orange';
-                            node_icon = pressure_icon;
-                            break;
-                        case 'RCR':
-                            color = '#ADD8E6';  // Light Blue
-                            node_icon = RCR_icon;
-                            break;
-                        case 'CORONARY':
-                            color = '#800020';  // Burgundy
-                            node_icon = coronary_icon;
-                            break;
-                        default:
-                            color = 'grey';  // Default color for unknown types
-                            break;
-                    }
-                } else {
-                    switch (nodeType) {
-                        case 'vessel':  // Cardinal Red
-                            color = '#C41E3A';
-                            node_icon = vessel_icon;
-                            break;
-                        case 'valve':
-                            color = 'black';
-                            node_icon = valve_icon; // https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vector%2Fheart-valve-disease-line-icon-vector-47167009&psig=AOvVaw39gwsTXwtIDM9KxgEODvmZ&ust=1721929537132000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLi788edwIcDFQAAAAAdAAAAABAE
-                            break;
-                        case 'chamber':
-                            color = 'pink';
-                            node_icon = chamber_icon;
-                            break;
-                        case 'junction':
-                            color = '#046791';  // Dark Blue
-                            node_icon = junction_icon;
-                            break;
-                        default:
-                            color = 'black';
-                            node_icon = None;
-                            break;
-                    }
-            }
-            let div = document.createElement("div");
-            div.innerHTML = "";
-            div.classList.add('draggable'); // Adds custom class so the nodes can be tracked in Cypress E2E testing
-            div.style.width = '30px';
-            div.style.height = '30px';
-            let newNode = cy.add({
-                   group: 'nodes',
-                   data: { id: nodeId, type: nodeType, name: nodeName,
-                   cls_name: boundaryConditionType || nodeType, dom: div},
-                   position: { x: pos.x, y: pos.y },
-                   style: {'background-image': `url(${node_icon})`,
-                    'background-fit': 'cover', // Ensure the image covers the node
-                    'background-opacity': 1,   // Ensure the background is fully opaque
-                    'border-color': color,     // Example border color
-                    'border-width': 2,         // Example border width
-                    'background-color': 'white' // Ensure background color does not override image
-                    }
-            });
-            console.log('Node created:', newNode.json());
+                    let color;
+                    if (nodeType === 'boundary_condition') {
+                        // Sets the icons and edge color for each node
+                        switch (boundaryConditionType) {
+                            case 'FLOW':
+                                color = '#FF00FF';  // Magenta
+                                node_icon = flow_icon;
+                                break;
+                            case 'RESISTANCE':
+                                color = 'purple';
+                                node_icon = resistance_icon;
+                                break;
+                            case 'PRESSURE':
+                                color = 'orange';
+                                node_icon = pressure_icon;
+                                break;
+                            case 'RCR':
+                                color = '#ADD8E6';  // Light Blue
+                                node_icon = RCR_icon;
+                                break;
+                            case 'CORONARY':
+                                color = '#800020';  // Burgundy
+                                node_icon = coronary_icon;
+                                break;
+                            default:
+                                color = 'grey';  // Default color for unknown types
+                                break;
+                        }
+                    } else {
+                        switch (nodeType) {
+                            case 'vessel':  // Cardinal Red
+                                color = '#C41E3A';
+                                node_icon = vessel_icon;
+                                break;
+                            case 'valve':
+                                color = 'black';
+                                node_icon = valve_icon; // https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vector%2Fheart-valve-disease-line-icon-vector-47167009&psig=AOvVaw39gwsTXwtIDM9KxgEODvmZ&ust=1721929537132000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLi788edwIcDFQAAAAAdAAAAABAE
+                                break;
+                            case 'chamber':
+                                color = 'pink';
+                                node_icon = chamber_icon;
+                                break;
+                            case 'junction':
+                                color = '#046791';  // Dark Blue
+                                node_icon = junction_icon;
+                                break;
+                            default:
+                                color = 'black';
+                                node_icon = None;
+                                break;
+                        }
+                }
+                let div = document.createElement("div");
+                div.innerHTML = "";
+                div.classList.add('draggable'); // Adds custom class so the nodes can be tracked in Cypress E2E testing
+                div.style.width = '30px';
+                div.style.height = '30px';
+                let newNode = cy.add({
+                       group: 'nodes',
+                       data: { id: nodeId, type: nodeType, name: nodeName,
+                       cls_name: boundaryConditionType || nodeType, dom: div},
+                       position: { x: pos.x, y: pos.y },
+                       style: {'background-image': `url(${node_icon})`,
+                        'background-fit': 'cover', // Ensure the image covers the node
+                        'background-opacity': 1,   // Ensure the background is fully opaque
+                        'border-color': color,     // Example border color
+                        'border-width': 2,         // Example border width
+                        'background-color': 'white' // Ensure background color does not override image
+                        }
+                });
+                console.log('Node created:', newNode.json());
+                }
             }
             else {
                 alert("Please enter a node name.");
             }
         }
-    });
-
-
-    var eh = cy.edgehandles({
-        enabled: false // Initializes the edge handle as turned off until user clicks draw on button
-    });
-
-   // Enables edge drawing when the user clicks the draw-on button
-   document.querySelector('#draw-on').addEventListener('click', function() {
-        eh.enableDrawMode();
-        eh.enable();
-   });
-
-    // Disables edge drawing when the user clicks the draw-off button
-    document.querySelector('#draw-off').addEventListener('click', function() {
-        eh.disableDrawMode();
-        eh.disable();
     });
 
     // Function to calculate R, C, L
@@ -727,16 +719,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Toggles the text on the delete-mode-button.
     function toggleDeleteMode() {
-            deleteMode = !deleteMode;
-            if (deleteMode) {
-                document.getElementById('delete-mode-button').innerText = 'Exit Delete Mode';
-            } else {
-                document.getElementById('delete-mode-button').innerText = 'Enter Delete Mode';
-            }
+        deleteMode = !deleteMode;
+        if (deleteMode) {
+            document.getElementById('delete-mode-button').innerText = 'Exit Delete Mode';
+        } else {
+            document.getElementById('delete-mode-button').innerText = 'Enter Delete Mode';
         }
+    }
+
+    var eh = cy.edgehandles({
+        enabled: false // Initializes the edge handle as turned off until user clicks draw on button
+    });
+
+    // Toggles the edge drawing & text on the edge-draw-button
+    function toggleDrawMode() {
+        if (isDrawModeEnabled) {
+            eh.disableDrawMode();
+            eh.disable();
+            isDrawModeEnabled = false;
+            document.getElementById('edge-draw-button').innerText = 'Turn Draw Mode On';
+        } else {
+            eh.enableDrawMode();
+            eh.enable();
+            isDrawModeEnabled = true;
+            document.getElementById('edge-draw-button').innerText = 'Turn Draw Mode Off';
+        }
+    }
 
     // Add event listener to the delete button
     document.getElementById('delete-mode-button').addEventListener('click', toggleDeleteMode);
+
+     // Add event listener to the draw mode button
+    document.getElementById('edge-draw-button').addEventListener('click', toggleDrawMode);
 
 
     // Event listener to show the form when a node is clicked
