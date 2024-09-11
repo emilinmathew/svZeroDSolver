@@ -14,7 +14,7 @@ describe('Simple Render Tests', () => {
         cy.get('#numcycles').type('5');
         cy.get('#numtimepts').type('5');
         cy.get('#submitSimParamButton').click();
-
+        cy.get('#SimParametersForm').should('not.be.visible');
         // Create a BC
         cy.get("#node-type").select("boundary_condition").invoke("val").should("eq", "boundary_condition");
         // Select Inflow
