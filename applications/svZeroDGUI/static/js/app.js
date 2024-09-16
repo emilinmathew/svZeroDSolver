@@ -41,8 +41,17 @@ const flow_icon = '/static/css/flow.png';
 document.addEventListener('DOMContentLoaded', function() {
     let simulation_parameters_dict = {};
     let node_name_list = [];
-    var deleteMode = false;
+    var deleteNodeMode = false;
+    var deleteEdgeMode = false;
     let isDrawModeEnabled = false; // Track the state of draw mode
+
+    document.querySelector('#submitResistanceButton').addEventListener('click', function() {
+            submitResistanceInfo();
+        });
+
+    document.querySelector('#submitRCRButton').addEventListener('click', function() {
+            submitRCRInfo();
+        });
 
      document.querySelector('#submitJunctionButton').addEventListener('click', function() {
             submitJunctionInfo();
@@ -50,6 +59,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
      document.querySelector('#submitVesselButton').addEventListener('click', function() {
             submitVesselInfo();
+        });
+
+     document.querySelector('#submitChamberButton').addEventListener('click', function() {
+            submitChamberInfo();
+        });
+
+     document.querySelector('#submitValveButton').addEventListener('click', function() {
+            submitValveInfo();
         });
 
      document.querySelector('#submitSimParamButton').addEventListener('click', function() {
@@ -98,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Sets the icons and edge color for each node
                         switch (boundaryConditionType) {
                             case 'FLOW':
-                                color = '#FF00FF';  // Magenta
+                                color = '#06402B';  // Dark Green
                                 node_icon = flow_icon;
                                 break;
                             case 'RESISTANCE':
@@ -106,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 node_icon = resistance_icon;
                                 break;
                             case 'PRESSURE':
-                                color = 'orange';
+                                color = '#00008B';  // Dark blue
                                 node_icon = pressure_icon;
                                 break;
                             case 'RCR':
@@ -217,13 +234,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         boundaryCondition.bc_values = {"Q": [], "t":[]};
                         break;
                     case "RESISTANCE":
-                        boundaryCondition.bc_values = {"Pd": '', "R":''};
+                        boundaryCondition.bc_values = {
+                            "Pd": additionalData.R_Pd || "",
+                            "R": additionalData.R_R || ""
+                            };
                         break;
                     case "PRESSURE":
                         boundaryCondition.bc_values = {"P": [], "t": []};
                         break;
                     case "RCR":
-                        boundaryCondition.bc_values = {"C": '', "Pd":'', "Rd":'', "Rp":''};
+                        boundaryCondition.bc_values = {
+                            "C": additionalData.RCR_C || "",
+                            "Pd": additionalData.RCR_Pd || "",
+                            "Rd": additionalData.RCR_Rd || "",
+                            "Rp": additionalData.RCR_Rp || "" };
                         break;
                     default:
                         boundaryCondition.bc_values = {
@@ -270,13 +294,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 detected_objects.vessels.push(vesselObject);
                 break;
             case 'valve':
+                console.log("valve");
                 detected_objects.valves.push({
                     type: 'ValveTanh',
                     name: data.name,
                     params: {
-                        Rmax: "",
-                        Rmin: "",
-                        Steepness: "",
+                        Rmax: additionalData.Rmax || "",
+                        Rmin: additionalData.Rmin || "",
+                        Steepness: additionalData.Steepness || "",
                         upstream_block: getUpstream(node),
                         downstream_block: getDownstream(node)
                     }
@@ -287,13 +312,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: data.name,
                     type: 'ChamberElastanceInductor',
                     values: {
-                        Emax: '',
-                        Emin: '',
-                        Vrd: '',
-                        Vrs: '',
-                        t_active: '',
-                        t_twitch: '',
-                        Impedance: ''
+                        Emax: additionalData.Emax || "",
+                        Emin: additionalData.Emin || "",
+                        Vrd: additionalData.Vrd || "",
+                        Vrs: additionalData.Vrs || "",
+                        t_active: additionalData.t_active || "",
+                        t_twitch: additionalData.t_twitch || "",
+                        Impedance: additionalData.Impedance || ""
                     }
                 });
                 break;
@@ -562,6 +587,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('nodeInfoModal').style.display = 'block';
         document.getElementById('SimParametersForm').style.display = 'block';
         document.getElementById('vesselForm').style.display = 'none';
+        document.getElementById('valveForm').style.display = 'none';
+        document.getElementById('chamberForm').style.display = 'none';
         document.getElementById('junctionForm').style.display = 'none';
     }
 
@@ -575,21 +602,34 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal()
     }
 
-
     // Function to show the modal form
     function showNodeInfoModal(nodeType) {
         document.getElementById('nodeInfoModal').style.display = 'block';
         document.getElementById('SimParametersForm').style.display = 'none';
 
-        // Show specific form based on node type
-        if (nodeType === 'vessel') {
-            document.getElementById('vesselForm').style.display = 'block';
-            document.getElementById('junctionForm').style.display = 'none';
+        // Define form mapping
+        const forms = {
+            'vessel': 'vesselForm',
+            'junction': 'junctionForm',
+            'valve': 'valveForm',
+            'chamber': 'chamberForm',
+            'RCR': 'RCRForm',
+            'RESISTANCE': 'ResistanceForm'
+        };
+
+        // Get the form IDs based on nodeType
+        const formIdToShow = forms[nodeType];
+
+        // Hide all forms
+        Object.values(forms).forEach(formId => {
+            document.getElementById(formId).style.display = 'none';
+        });
+
+        // Show the selected form
+        if (formIdToShow) {
+            document.getElementById(formIdToShow).style.display = 'block';
         }
-        else if (nodeType === 'junction') {
-            document.getElementById('junctionForm').style.display = 'block';
-            document.getElementById('vesselForm').style.display = 'none';
-        }
+
     }
 
     // Show or hide the junction parameters form based on the selected junction type
@@ -602,7 +642,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to hide the modal form
     function hideNodeInfoModal() {
         document.getElementById('nodeInfoModal').style.display = 'none';
-        document.getElementById('vesselForm').style.display = 'none'; // Hide the form
     }
 
     // Show or hide the custom Young's modulus input field based on the selected value
@@ -715,14 +754,100 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         hideNodeInfoModal(); // Hide the modal form
     }
+    function submitChamberInfo() {
+        let additionalData = {};
 
-    // Toggles the text on the delete-mode-button.
-    function toggleDeleteMode() {
-        deleteMode = !deleteMode;
-        if (deleteMode) {
-            document.getElementById('delete-mode-button').innerText = 'Exit Delete Mode';
+        if (currentType === 'chamber') {
+            // add the form information to additionalData so it can be attached to the valve
+            additionalData.Emax = parseFloat(document.getElementById('Emax').value);
+            additionalData.Emin = parseFloat(document.getElementById('Emin').value);
+            additionalData.Vrd = parseFloat(document.getElementById('Vrd').value);
+            additionalData.Vrs = parseFloat(document.getElementById('Vrs').value);
+            additionalData.t_active = parseFloat(document.getElementById('t_active').value);
+            additionalData.t_twitch = parseFloat(document.getElementById('t_twitch').value);
+            additionalData.Impedance = parseFloat(document.getElementById('Impedance').value);
+            currentNode.data('additional_data', additionalData); // Update node with additional data
+
+            // reset form inputs
+            document.getElementById('Emax').value = '';
+            document.getElementById('Emin').value = '';
+            document.getElementById('Vrd').value = '';
+            document.getElementById('Vrs').value = '';
+            document.getElementById('t_active').value = '';
+            document.getElementById('t_twitch').value = '';
+            document.getElementById('Impedance').value = '';
+        }
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
+    function submitResistanceInfo() {
+        let additionalData = {};
+
+        // add the form information to additionalData so it can be attached to the valve
+        additionalData.R_Pd = parseFloat(document.getElementById('R_Pd').value);
+        additionalData.R_R = parseFloat(document.getElementById('R_R').value);
+        currentNode.data('additional_data', additionalData); // Update node with additional data
+
+        // reset form inputs
+        document.getElementById('R_Pd').value = '';
+        document.getElementById('R_R').value = '';
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
+
+    function submitRCRInfo() {
+        let additionalData = {};
+
+        // add the form information to additionalData so it can be attached to the valve
+        additionalData.RCR_C = parseFloat(document.getElementById('RCR_C').value);
+        additionalData.RCR_Pd = parseFloat(document.getElementById('RCR_Pd').value);
+        additionalData.RCR_Rd = parseFloat(document.getElementById('RCR_Rd').value);
+        additionalData.RCR_Rp = parseFloat(document.getElementById('RCR_Rp').value);
+        currentNode.data('additional_data', additionalData); // Update node with additional data
+
+        // reset form inputs
+        document.getElementById('RCR_C').value = '';
+        document.getElementById('RCR_Pd').value = '';
+        document.getElementById('RCR_Rd').value = '';
+        document.getElementById('RCR_Rp').value = '';
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
+    function submitValveInfo() {
+        let additionalData = {};
+
+        if (currentType === 'valve') {
+            // add the form information to additionalData so it can be attached to the valve
+            additionalData.Rmax = parseFloat(document.getElementById('Rmax').value);
+            additionalData.Rmin = parseFloat(document.getElementById('Rmin').value);
+            additionalData.Steepness = parseFloat(document.getElementById('Steepness').value);
+            currentNode.data('additional_data', additionalData); // Update node with additional data
+
+            // reset form inputs
+            document.getElementById('Rmax').value = '';
+            document.getElementById('Rmin').value = '';
+            document.getElementById('Steepness').value = '';
+        }
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
+
+    // Toggles the text on the delete-node-button.
+    function toggleNodeDeleteMode() {
+        deleteNodeMode = !deleteNodeMode;
+        if (deleteNodeMode) {
+            document.getElementById('delete-node-button').innerText = 'Exit Delete Node Mode';
         } else {
-            document.getElementById('delete-mode-button').innerText = 'Enter Delete Mode';
+            document.getElementById('delete-node-button').innerText = 'Enter Delete Node Mode';
+        }
+    }
+
+    function toggleEdgeDeleteMode() {
+        deleteEdgeMode = !deleteEdgeMode;
+        if (deleteEdgeMode) {
+            document.getElementById('delete-edge-button').innerText = 'Exit Delete Edge Mode';
+        } else {
+            document.getElementById('delete-edge-button').innerText = 'Enter Delete Edge Mode';
         }
     }
 
@@ -745,8 +870,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Add event listener to the delete button
-    document.getElementById('delete-mode-button').addEventListener('click', toggleDeleteMode);
+    // Add event listener to the delete node button
+    document.getElementById('delete-node-button').addEventListener('click', toggleNodeDeleteMode);
+
+    // Add event listener to the delete edge button
+    document.getElementById('delete-edge-button').addEventListener('click', toggleEdgeDeleteMode);
 
      // Add event listener to the draw mode button
     document.getElementById('edge-draw-button').addEventListener('click', toggleDrawMode);
@@ -756,24 +884,32 @@ document.addEventListener('DOMContentLoaded', function() {
     cy.on('tap', 'node', function(event) {
         currentNode = event.target;
         currentType = currentNode.data('type');
-        if (deleteMode) {
-                var node = event.target;
-                node_name = node.data('name');
-                node.remove();
-                var index = node_name_list.indexOf(node_name);
-                if (index !== -1) {
-                    // Remove the nodeName from the list
-                    node_name_list.splice(index, 1);
-                }
+        if (deleteNodeMode) {
+            node_name = currentNode.data('name');
+            currentNode.remove();
+            var index = node_name_list.indexOf(node_name);
+            if (index !== -1) {
+                // Remove the nodeName from the list
+                node_name_list.splice(index, 1);
+            }
         }
-        else if (currentType == 'vessel') {
+        else if (currentType == 'boundary_condition') {
+            bc_type = currentNode.data('cls_name');
+            showNodeInfoModal(bc_type); // Show the modal form
+        }
+        else {
             showNodeInfoModal(currentType); // Show the modal form
         }
-        else if (currentType == 'junction') {
-            showNodeInfoModal(currentType); // Show the modal form
-        }
-
     });
+
+    // Event listener to see if an edge should be removed
+    cy.on('tap', 'edge', function(event) {
+        var target = event.target;
+        if (target.isEdge() && deleteEdgeMode) {
+            cy.remove(target); // Use cy.remove() to remove the edge from Cytoscape
+        }
+    });
+
 
     // Get all elements with the class 'collapsible'
     var coll = document.getElementsByClassName("collapsible");
