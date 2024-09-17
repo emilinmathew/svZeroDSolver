@@ -206,7 +206,72 @@
             <input type="number" id="R_R"><br>
             <button id="submitResistanceButton">Submit</button>
         </div>
-
+        <div id="FlowForm" style="display:none;">
+            <p id="form-title">Enter Flow Information</p>
+            <div style="margin-bottom: 10px;">
+                <label for="flow-file-upload">Upload a text file for flow rates:</label>
+                <input type="file" id="flow-file-upload" accept=".txt">
+                <br>
+                <label for="flow-manual-input">Or enter comma-separated values:</label>
+                <input type="text" id="flow-manual-input" placeholder="e.g. 1.2, 3.4, 5.6">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="flow-time-file-upload">Upload a text file for time data:</label>
+                <input type="file" id="flow-time-file-upload" accept=".txt">
+                <br>
+                <label for="flow-time-manual-input">Or enter comma-separated values:</label>
+                <input type="text" id="flow-time-manual-input" placeholder="e.g. 1.2, 3.4, 5.6">
+            </div>
+            <button id="submitFlowButton">Submit</button>
+        </div>
+        <div id="PressureForm" style="display:none;">
+            <p id="form-title">Enter Pressure Information</p>
+            <div style="margin-bottom: 10px;">
+                <label for="pressure-file-upload">Upload a text file for pressure data:</label>
+                <input type="file" id="pressure-file-upload" accept=".txt">
+                <br>
+                <label for="pressure-manual-input">Or enter comma-separated values:</label>
+                <input type="text" id="pressure-manual-input" placeholder="e.g. 1.2, 3.4, 5.6">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="pressure-time-file-upload">Upload a text file for time data:</label>
+                <input type="file" id="pressure-time-file-upload" accept=".txt">
+                <br>
+                <label for="pressure-time-manual-input">Or enter comma-separated values:</label>
+                <input type="text" id="pressure-time-manual-input" placeholder="e.g. 1.2, 3.4, 5.6">
+            </div>
+            <button id="submitPressureButton">Submit</button>
+        </div>
+        <div id="CoronaryForm" style="display:none;">
+            <p id="form-title">Enter Coronary Information</p>
+            <label for="Ca">Ca:</label>
+            <input type="number" id="Ca"><br>
+            <label for="Cc">Cc:</label>
+            <input type="number" id="Cc"><br>
+            <div style="margin-bottom: 10px;">
+                <label for="Pim-file-upload">Upload a text file for Pim data:</label>
+                <input type="file" id="Pim-file-upload" accept=".txt">
+                <br>
+                <label for="Pim-manual-input">Or enter comma-separated values:</label>
+                <input type="text" id="Pim-manual-input" placeholder="e.g. 1.2, 3.4, 5.6">
+            </div>
+            <label for="P_v">P_v:</label>
+            <input type="number" id="P_v"><br>
+            <label for="Ra1">Ra1:</label>
+            <input type="number" id="Ra1"><br>
+            <label for="Ra2">Ra2:</label>
+            <input type="number" id="Ra2"><br>
+            <label for="Rv1">Rv1:</label>
+            <input type="number" id="Rv1"><br>
+            <div style="margin-bottom: 10px;">
+                <label for="coronary-time-file-upload">Upload a text file for time data:</label>
+                <input type="file" id="coronary-time-file-upload" accept=".txt">
+                <br>
+                <label for="coronary-time-manual-input">Or enter comma-separated values:</label>
+                <input type="text" id="coronary-time-manual-input" placeholder="e.g. 1.2, 3.4, 5.6">
+            </div>
+            <button id="submitCoronaryButton">Submit</button>
+        </div>
     </div>
 
 

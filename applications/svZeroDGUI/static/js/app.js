@@ -45,6 +45,18 @@ document.addEventListener('DOMContentLoaded', function() {
     var deleteEdgeMode = false;
     let isDrawModeEnabled = false; // Track the state of draw mode
 
+    document.querySelector('#submitCoronaryButton').addEventListener('click', function() {
+            submitCoronaryInfo();
+        });
+
+     document.querySelector('#submitPressureButton').addEventListener('click', function() {
+            submitPressureInfo();
+        });
+
+    document.querySelector('#submitFlowButton').addEventListener('click', function() {
+            submitFlowInfo();
+        });
+
     document.querySelector('#submitResistanceButton').addEventListener('click', function() {
             submitResistanceInfo();
         });
@@ -221,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cy.nodes().forEach(node => {
         let data = node.data();
         let additionalData = data.additional_data || {};
+        console.log(additionalData)
         switch(data.type) {
             case 'boundary_condition':
                 let boundaryCondition = {
@@ -231,7 +244,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 switch (data.cls_name) {  // Assuming cls_name is the field that specifies the boundary condition type
                     case "FLOW":
-                        boundaryCondition.bc_values = {"Q": [], "t":[]};
+                        boundaryCondition.bc_values = {
+                            "Q": additionalData.Q || '',
+                            "t": additionalData.T || ''
+                            };
                         break;
                     case "RESISTANCE":
                         boundaryCondition.bc_values = {
@@ -240,7 +256,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             };
                         break;
                     case "PRESSURE":
-                        boundaryCondition.bc_values = {"P": [], "t": []};
+                        boundaryCondition.bc_values = {
+                        "P": additionalData.P || '',
+                        "t": additionalData.T || ''
+                        };
                         break;
                     case "RCR":
                         boundaryCondition.bc_values = {
@@ -249,10 +268,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             "Rd": additionalData.RCR_Rd || "",
                             "Rp": additionalData.RCR_Rp || "" };
                         break;
-                    default:
+                    case "CORONARY":
                         boundaryCondition.bc_values = {
-                            "Ca": '', "Cc":'' , "Pim": [], "P_v": '',
-                            "Ra1": '', "Ra2": '' , "Rv1": '', "t": []
+                            "Ca": additionalData.Ca || "",
+                            "Cc": additionalData.Cc || "",
+                            "Pim": additionalData.Pim || "",
+                            "P_v": additionalData.P_v || "",
+                            "Ra1": additionalData.Ra1 || "",
+                            "Ra2": additionalData.Ra2 || "",
+                            "Rv1": additionalData.Rv1 || "",
+                            "t": additionalData.T || ""
                         };
                         break;
                 }
@@ -586,10 +611,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function setSimParameters() {
         document.getElementById('nodeInfoModal').style.display = 'block';
         document.getElementById('SimParametersForm').style.display = 'block';
-        document.getElementById('vesselForm').style.display = 'none';
-        document.getElementById('valveForm').style.display = 'none';
-        document.getElementById('chamberForm').style.display = 'none';
-        document.getElementById('junctionForm').style.display = 'none';
     }
 
     // Parses the results from the simulation parameters form once the user submits it.
@@ -614,7 +635,10 @@ document.addEventListener('DOMContentLoaded', function() {
             'valve': 'valveForm',
             'chamber': 'chamberForm',
             'RCR': 'RCRForm',
-            'RESISTANCE': 'ResistanceForm'
+            'RESISTANCE': 'ResistanceForm',
+            'FLOW': 'FlowForm',
+            'PRESSURE': 'PressureForm',
+            'CORONARY': 'CoronaryForm'
         };
 
         // Get the form IDs based on nodeType
@@ -779,6 +803,90 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         hideNodeInfoModal(); // Hide the modal form
     }
+
+    function processInput(fileInputId, manualInputId, key, additionalData) {
+        const fileInput = document.getElementById(fileInputId);
+        const manualInput = document.getElementById(manualInputId).value;
+
+        if (fileInput.files.length > 0) {
+            // If a file is uploaded, read and parse the file
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const fileContent = e.target.result;
+                const values = fileContent
+                    .split('\n')
+                    .map(Number)
+                    .filter(Boolean);  // Parse values from file
+
+                // Add values to `additionalData`
+                additionalData[key] = values;
+                console.log(`Values from ${fileInputId} added to additionalData.${key}:`, additionalData);
+
+                // Clear file input after processing
+                fileInput.value = '';
+            };
+            reader.readAsText(file);
+        } else if (manualInput) {
+            // If manual input is provided, parse the comma-separated values
+            const values = manualInput
+                .split(',')
+                .map(Number)
+                .filter(Boolean);  // Parse comma-separated values
+
+            // Add values to `additionalData`
+            additionalData[key] = values;
+            console.log(`Values from manual input ${manualInputId} added to additionalData.${key}:`, additionalData);
+
+            // Clear manual input after processing
+            document.getElementById(manualInputId).value = '';
+        }
+    }
+
+    function submitFlowInfo() {
+        let additionalData = {};
+
+        // Process 'flow' and 'time' inputs
+        processInput('flow-file-upload', 'flow-manual-input', 'Q', additionalData);
+        processInput('flow-time-file-upload', 'flow-time-manual-input', 'T', additionalData);
+        currentNode.data('additional_data', additionalData);
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
+
+    function submitCoronaryInfo() {
+        let additionalData = {};
+        additionalData.Ca = parseFloat(document.getElementById('Ca').value);
+        additionalData.Cc = parseFloat(document.getElementById('Cc').value);
+        additionalData.P_v = parseFloat(document.getElementById('P_v').value);
+        additionalData.Ra1 = parseFloat(document.getElementById('Ra1').value);
+        additionalData.Ra2 = parseFloat(document.getElementById('Ra2').value);
+        additionalData.Rv1 = parseFloat(document.getElementById('Rv1').value);
+
+        // Process 'flow' and 'time' inputs
+        processInput('Pim-file-upload', 'Pim-manual-input', 'Pim', additionalData);
+        processInput('coronary-time-file-upload', 'coronary-time-manual-input', 'T', additionalData);
+        currentNode.data('additional_data', additionalData);
+
+        // reset form inputs
+        document.getElementById('Ca').value = '';
+        document.getElementById('Cc').value = '';
+        document.getElementById('Ra1').value = '';
+        document.getElementById('Ra2').value = '';
+        document.getElementById('Rv1').value = '';
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
+    function submitPressureInfo() {
+        let additionalData = {};
+        // Process 'flow' and 'time' inputs
+        processInput('pressure-file-upload', 'pressure-manual-input', 'P', additionalData);
+        processInput('pressure-time-file-upload', 'pressure-time-manual-input', 'T', additionalData);
+        currentNode.data('additional_data', additionalData);
+        hideNodeInfoModal(); // Hide the modal form
+    }
+
 
     function submitResistanceInfo() {
         let additionalData = {};
