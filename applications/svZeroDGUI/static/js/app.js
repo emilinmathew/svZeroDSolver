@@ -778,6 +778,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         hideNodeInfoModal(); // Hide the modal form
     }
+
+    // Function to submit a chamber node's information and update its data
     function submitChamberInfo() {
         let additionalData = {};
 
@@ -804,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal(); // Hide the modal form
     }
 
+    // Function to process multiple values for a parameter with either file or manual upload
     function processInput(fileInputId, manualInputId, key, additionalData) {
         const fileInput = document.getElementById(fileInputId);
         const manualInput = document.getElementById(manualInputId).value;
@@ -844,9 +847,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Function to submit a flow node's information and update its data
     function submitFlowInfo() {
         let additionalData = {};
-
         // Process 'flow' and 'time' inputs
         processInput('flow-file-upload', 'flow-manual-input', 'Q', additionalData);
         processInput('flow-time-file-upload', 'flow-time-manual-input', 'T', additionalData);
@@ -854,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal(); // Hide the modal form
     }
 
-
+    // Function to submit a Coronary BC node's information and update its data
     function submitCoronaryInfo() {
         let additionalData = {};
         additionalData.Ca = parseFloat(document.getElementById('Ca').value);
@@ -878,6 +881,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal(); // Hide the modal form
     }
 
+    // Function to submit a pressure node's information and update its data
     function submitPressureInfo() {
         let additionalData = {};
         // Process 'flow' and 'time' inputs
@@ -887,7 +891,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal(); // Hide the modal form
     }
 
-
+// Function to submit a resistance node's information and update its data
     function submitResistanceInfo() {
         let additionalData = {};
 
@@ -902,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal(); // Hide the modal form
     }
 
-
+    // Function to submit a RCR node's information and update its data
     function submitRCRInfo() {
         let additionalData = {};
 
@@ -921,6 +925,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideNodeInfoModal(); // Hide the modal form
     }
 
+    // Function to submit a valve node's information and update its data
     function submitValveInfo() {
         let additionalData = {};
 
@@ -938,7 +943,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         hideNodeInfoModal(); // Hide the modal form
     }
-
 
     // Toggles the text on the delete-node-button.
     function toggleNodeDeleteMode() {

@@ -147,7 +147,7 @@ describe('Node interaction', () => {
         // Create a vessel
         cy.get("#node-type").select("vessel").invoke("val").should("eq", "vessel");
         // type node name
-        cy.get('#node-name').type('vessel0');
+        cy.get('#node-name').type('vessel');
         // add node
         cy.get('body').click(200, 500);
         cy.get('body').click(200, 500);
