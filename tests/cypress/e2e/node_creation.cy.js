@@ -36,11 +36,6 @@ describe('Simple Render Tests', () => {
         // add node
         cy.get('body').click(200, 500);
         cy.get('body').click(200, 500);
-        cy.get('#vesselForm').should('be.visible');
-        cy.get('#vesselLengthInput').type('1');
-        cy.get('#vesselRadiusInput').type('1');
-        cy.get('#vesselStenosisDiameterInput').type('0');
-        cy.get('#submitVesselButton').click();
 
         // Make sure the node was added
         cy.get('.draggable').should('have.length', 2);
