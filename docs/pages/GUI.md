@@ -34,17 +34,9 @@ generating and managing 0D input files through a graphical interface.
 ```bash
 python applications/svZeroDGUI/app.py
 ```
-3. Select a node type and name the node.
-- For vessels, after drawing the node, click on it to open a form 
-where you can enter details such as vessel length, diameter, and more.
-- For junctions, click the node to specify if it’s a Normal Junction 
-or a Blood Vessel junction.
-4. To draw edges between nodes, toggle the `Draw on` button on the right. 
-Once active, you can start connecting nodes by drawing edges between them.
-5. When you wish to stop drawing edges and continue adding or moving nodes, 
-click the `Draw off` button.
-6. Once you’ve completed the network, click `Export to JSON` on the right. 
-If there are any incorrect connections or patterns, an alert will prompt you 
-to make necessary changes so the network can be processed by svZeroDSolver.
-7. Open the downloaded JSON file and add any additional information, 
-such as boundary condition data, before running it through svZeroDSolver.
+3. Select a node type and name the node. 
+4. Click on the drawing container to place the node. You can move it by holding it down and dragging it to a new position. 
+5. Tap the node again to enter simulation parameters specific to that node. 
+6. To draw edges between nodes, toggle the `Turn Draw Mode On` button on the right. Once active, connect nodes by drawing edges between them. 
+7. To stop drawing edges and continue adding or moving nodes, click the `Turn Draw Mode Off` button. 
+8. When the network is complete, click `Export to JSON` on the right. If there are any incorrect connections or patterns, an alert will prompt you to make the necessary adjustments so the network can be processed by svZeroDSolver.
